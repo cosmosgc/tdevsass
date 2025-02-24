@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\File;
+
+use App\Services\ServiceLoader;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +14,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Dynamically load all service providers in the services/ directory
+        foreach (File::directories(base_path('services')) as $serviceDir) {
+            $providerClass = "Services\\" . basename($serviceDir) . "\\ServiceProvider";
+            if (class_exists($providerClass)) {
+                $this->app->register($providerClass);
+            }
+        }
     }
 
     /**
@@ -19,6 +28,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        ServiceLoader::loadServices();
     }
 }

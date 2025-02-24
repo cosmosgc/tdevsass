@@ -1,0 +1,7 @@
+{
+    "name": "Chat Service",
+    "slug": "chat-service",
+    "description": "Provides real-time chat functionality.",
+    "price": 9.99,
+    "active": true
+}

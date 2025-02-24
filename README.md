@@ -1,66 +1,121 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 Laravel SaaS com Serviços Modulares
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📌 Sobre o Projeto
+Este projeto é uma aplicação SaaS (Software como Serviço) desenvolvida em **Laravel**, onde cada funcionalidade pode ser implementada como um serviço modular, funcionando de forma independente dentro da aplicação. Os serviços são organizados em um diretório específico (`services/`), permitindo fácil manutenção, adição e remoção.
 
-## About Laravel
+## 🏗️ Estrutura do Projeto
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```
+myapp/
+├── app/
+├── bootstrap/
+├── config/
+├── database/
+├── public/
+├── resources/
+├── routes/
+├── services/  <-- Diretório de Serviços Modulares
+│   ├── Calculator/
+│   │   ├── service.json
+│   │   ├── CalculatorService.php
+│   │   ├── CalculatorServiceProvider.php
+│   │   ├── routes.php
+│   │   ├── views/
+├── storage/
+└── tests/
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Cada serviço é um módulo independente e contém:
+- `service.json` → Metadados do serviço (ex: nome, descrição, preço).
+- `CalculatorService.php` → Lógica principal do serviço.
+- `CalculatorServiceProvider.php` → Provedor de serviço para registrar o módulo no Laravel.
+- `routes.php` → Arquivo de rotas específicas do serviço.
+- `views/` → Arquivos Blade para renderização do serviço.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🔌 Como Adicionar um Novo Serviço
 
-## Learning Laravel
+Para adicionar um novo serviço:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Crie uma pasta dentro de `services/` com o nome do serviço.
+2. Adicione os seguintes arquivos mínimos:
+   - `service.json` → Contendo informações sobre o serviço.
+   - `ServiceProvider.php` → Para registrar o serviço no Laravel.
+   - `routes.php` → Se houver rotas específicas para o serviço.
+   - `views/` → Templates para exibição do serviço (opcional).
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Exemplo de `service.json`:
+```json
+{
+    "name": "Calculadora",
+    "slug": "calculator",
+    "description": "Um serviço para cálculos matemáticos.",
+    "price": 9.99
+}
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Exemplo de `routes.php`:
+```php
+use Illuminate\Support\Facades\Route;
+use Services\Calculator\Controllers\CalculatorController;
 
-## Laravel Sponsors
+Route::prefix('calculator')->group(function () {
+    Route::get('/', [CalculatorController::class, 'index']);
+    Route::post('/calculate', [CalculatorController::class, 'calculate']);
+});
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## ⚙️ Registro Automático de Serviços
 
-### Premium Partners
+Para evitar a necessidade de registrar cada serviço manualmente, o **`AppServiceProvider.php`** inclui um código que detecta e registra automaticamente todos os provedores de serviço dentro do diretório `services/`:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```php
+use Illuminate\Support\Facades\File;
 
-## Contributing
+foreach (File::directories(base_path('services')) as $serviceDir) {
+    $serviceName = basename($serviceDir);
+    $providerClass = "Services\\{$serviceName}\\{$serviceName}ServiceProvider";
+    
+    if (class_exists($providerClass)) {
+        $this->app->register($providerClass);
+    }
+}
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🚀 Como Rodar o Projeto
 
-## Code of Conduct
+1. **Clone o repositório**
+   ```sh
+   git clone https://github.com/seu-usuario/seu-projeto.git
+   cd seu-projeto
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. **Instale as dependências**
+   ```sh
+   composer install
+   npm install
+   ```
 
-## Security Vulnerabilities
+3. **Configure o ambiente**
+   - Copie `.env.example` para `.env` e configure banco de dados e outras variáveis.
+   ```sh
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+4. **Execute as migrações**
+   ```sh
+   php artisan migrate
+   ```
 
-## License
+5. **Execute o servidor**
+   ```sh
+   php artisan serve
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Agora sua aplicação Laravel SaaS com serviços modulares estará rodando! 🚀
+
+---
+
+## 📜 Licença
+Este projeto é open-source e pode ser modificado conforme necessário. 🛠️
+

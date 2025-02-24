@@ -1,0 +1,6 @@
+{
+    "slug": "calculator",
+    "name": "Calculator Service",
+    "description": "Performs basic arithmetic operations.",
+    "price": 5.99
+}
