@@ -3,7 +3,7 @@ namespace App\Services;
 
 use App\Models\Service;
 use Illuminate\Support\Facades\File;
-
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 class ServiceLoader
@@ -46,6 +46,20 @@ class ServiceLoader
             }
         }
     }
+
+    public static function loadServiceMigrations()
+    {
+        $servicePath = base_path('services');
+        $directories = File::directories($servicePath);
+
+        foreach ($directories as $dir) {
+            $migrationPath = $dir . '/database/migrations';
+            if (File::exists($migrationPath)) {
+                Artisan::call('migrate', ['--path' => str_replace(base_path() . '/', '', $migrationPath)]);
+            }
+        }
+    }
+
 
 }
 

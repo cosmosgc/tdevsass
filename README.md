@@ -21,6 +21,8 @@ myapp/
 │   │   ├── CalculatorServiceProvider.php
 │   │   ├── routes.php
 │   │   ├── views/
+│   │   ├── database/
+│   │   │   ├── migrations/ <-- Migrações do Serviço
 ├── storage/
 └── tests/
 ```
@@ -31,6 +33,7 @@ Cada serviço é um módulo independente e contém:
 - `CalculatorServiceProvider.php` → Provedor de serviço para registrar o módulo no Laravel.
 - `routes.php` → Arquivo de rotas específicas do serviço.
 - `views/` → Arquivos Blade para renderização do serviço.
+- `database/migrations/` → Arquivos de migração específicos do serviço.
 
 ## 🔌 Como Adicionar um Novo Serviço
 
@@ -42,6 +45,7 @@ Para adicionar um novo serviço:
    - `ServiceProvider.php` → Para registrar o serviço no Laravel.
    - `routes.php` → Se houver rotas específicas para o serviço.
    - `views/` → Templates para exibição do serviço (opcional).
+   - `database/migrations/` → Caso o serviço precise modificar o banco de dados.
 
 ### Exemplo de `service.json`:
 ```json
@@ -81,12 +85,67 @@ foreach (File::directories(base_path('services')) as $serviceDir) {
 }
 ```
 
+## 📥 Carregamento Automático de Migrações dos Serviços
+
+Cada serviço pode ter seu próprio conjunto de migrações dentro do diretório `database/migrations/`. Para garantir que todas as migrações dos serviços sejam executadas junto com as migrações principais da aplicação, criamos um **ServiceMigrationProvider**:
+
+### Criando o `ServiceMigrationProvider.php`
+
+```php
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\File;
+
+class ServiceMigrationProvider extends ServiceProvider
+{
+    public function register()
+    {
+        // Carregar migrações dos serviços
+        $this->loadServiceMigrations();
+    }
+
+    protected function loadServiceMigrations()
+    {
+        $servicePath = base_path('services');
+        $directories = File::directories($servicePath);
+        $migrationPaths = [];
+
+        foreach ($directories as $dir) {
+            $migrationDir = $dir . '/database/migrations';
+
+            if (File::exists($migrationDir)) {
+                $migrationPaths[] = $migrationDir;
+            }
+        }
+
+        if (!empty($migrationPaths)) {
+            $this->loadMigrationsFrom($migrationPaths);
+        }
+    }
+}
+```
+
+### Registrando o Provider em `config/app.php`
+
+```php
+'providers' => [
+    App\Providers\ServiceMigrationProvider::class,
+],
+```
+
+Agora, todas as migrações dos serviços modulares serão executadas automaticamente ao rodar:
+```sh
+php artisan migrate
+```
+
 ## 🚀 Como Rodar o Projeto
 
 1. **Clone o repositório**
    ```sh
-   git clone https://github.com/seu-usuario/seu-projeto.git
-   cd seu-projeto
+   git clone https://github.com/cosmosgc/tdevsass
    ```
 
 2. **Instale as dependências**
@@ -102,7 +161,7 @@ foreach (File::directories(base_path('services')) as $serviceDir) {
    php artisan key:generate
    ```
 
-4. **Execute as migrações**
+4. **Execute as migrações** (incluindo módulos)
    ```sh
    php artisan migrate
    ```
