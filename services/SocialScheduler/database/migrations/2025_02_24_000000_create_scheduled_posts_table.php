@@ -10,6 +10,8 @@ return new class extends Migration {
             $table->id();
             $table->text('content');
             $table->timestamp('scheduled_at');
+            $table->json('platforms')->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
