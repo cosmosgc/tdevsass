@@ -9,7 +9,7 @@ class CalculatorController extends Controller
 {
     public function index()
     {
-        return view('calculator::index');
+        return view('Calculator::index');
     }
 
     public function calculate(Request $request, CalculatorService $calculator)

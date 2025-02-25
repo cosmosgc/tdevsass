@@ -7,7 +7,9 @@
                     <h5 class="text-xl font-semibold mb-2">{{ $service->name }}</h5>
                     <p class="text-gray-300 mb-4">{{ $service->description }}</p>
                     <p class="text-lg font-bold text-green-400">Price: ${{ number_format($service->price, 2) }}</p>
-                    <a href="{{ route('services.show', $service->slug) }}" class="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200">
+
+                    <a href="{{ url( $service->slug) }}"
+                       class="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200">
                         Open Service
                     </a>
                 </div>

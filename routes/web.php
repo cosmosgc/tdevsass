@@ -27,7 +27,6 @@ Route::middleware('auth')->group(function () {
 use App\Http\Controllers\ServiceController;
 
 Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
-Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('services.show');
 
 ServiceLoader::loadServiceRoutes();
 

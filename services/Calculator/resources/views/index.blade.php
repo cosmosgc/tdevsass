@@ -1,8 +1,5 @@
 <x-app-layout>
     <div class="container mx-auto px-4 py-8 text-white">
-        <h1 class="text-3xl font-bold mb-6 text-center">{{ $service->name }}</h1>
-        <p class="text-gray-300 text-center mb-6">{{ $service->description }}</p>
-
         <div class="max-w-md mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
             <h2 class="text-xl font-semibold mb-4 text-center">Calculator</h2>
             <input type="number" id="num1" placeholder="Enter first number" class="w-full p-2 mb-2 bg-gray-700 rounded text-black">

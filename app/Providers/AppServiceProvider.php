@@ -16,12 +16,15 @@ class AppServiceProvider extends ServiceProvider
     {
         // Dynamically load all service providers in the services/ directory
         foreach (File::directories(base_path('services')) as $serviceDir) {
-            $providerClass = "Services\\" . basename($serviceDir) . "\\ServiceProvider";
+            $serviceName = basename($serviceDir);
+            $providerClass = "Services\\{$serviceName}\\{$serviceName}ServiceProvider"; // ✅ Match naming convention
+
             if (class_exists($providerClass)) {
                 $this->app->register($providerClass);
             }
         }
     }
+
 
     /**
      * Bootstrap any application services.
@@ -30,5 +33,9 @@ class AppServiceProvider extends ServiceProvider
     {
         ServiceLoader::loadServices();
         ServiceLoader::loadServiceMigrations();
+        ServiceLoader::registerServiceProviders();
+        ServiceLoader::loadServiceRoutes();
+        ServiceLoader::loadServiceViews();
     }
+
 }
