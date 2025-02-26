@@ -62,19 +62,28 @@
         <h2 class="text-2xl font-semibold text-white mt-8 mb-4">📜 Postagens Agendadas</h2>
 
         <ul class="space-y-3">
-            @foreach($posts as $post)
-                <li class="bg-gray-800 p-4 rounded-lg shadow-lg text-white">
-                    <div class="flex justify-between">
-                        <span class="flex-1">{{ $post->content }}</span>
-                        <span class="text-gray-400 text-sm">
-                            {{ \Carbon\Carbon::parse($post->scheduled_at)->format('d/m/Y H:i') }}
-                        </span>
-                    </div>
-                    <div class="mt-2 text-gray-400 text-sm">
-                        📢 Publicado em: {{ implode(', ', json_decode($post->platforms ?? '[]', true)) ?: 'Nenhuma' }}
-                    </div>
-                </li>
-            @endforeach
+        @foreach($posts as $post)
+            <li class="bg-gray-800 p-4 rounded-lg shadow-lg text-white">
+                <div class="flex justify-between">
+                    <span class="flex-1">{{ $post->content }}</span>
+                    <span class="text-gray-400 text-sm">
+                        {{ \Carbon\Carbon::parse($post->scheduled_at)->format('d/m/Y H:i') }}
+                    </span>
+                </div>
+                <div class="mt-2 text-gray-400 text-sm">
+                    📢 Publicado em: {{ implode(', ', json_decode($post->platforms ?? '[]', true)) ?: 'Nenhuma' }}
+                </div>
+                <div class="mt-2">
+                    <form action="{{ route('social.post.now', $post->id) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded">
+                            Postar Agora
+                        </button>
+                    </form>
+                </div>
+            </li>
+        @endforeach
+
         </ul>
 
         @if ($posts->isEmpty())
