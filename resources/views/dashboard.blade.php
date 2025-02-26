@@ -12,6 +12,14 @@
                     {{ __("You're logged in!") }}
                 </div>
             </div>
+
+            <!-- Botão para a rota de Serviços -->
+            <div class="mt-6 text-center">
+                <a href="{{ url('/services') }}"
+                   class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                    📌 Ver Serviços
+                </a>
+            </div>
         </div>
     </div>
 </x-app-layout>

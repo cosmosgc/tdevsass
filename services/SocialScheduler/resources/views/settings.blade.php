@@ -1,9 +1,4 @@
 <x-app-layout>
-    @php
-        //$enabledNetworks = json_decode($settings->enabled_networks ?? '[]', true);
-        //$apiKeys = json_decode($settings->api_keys ?? '{}', true); // Decodes stored API keys
-    @endphp
-
     <div class="container mx-auto max-w-2xl px-6 py-8">
         <h1 class="text-3xl font-bold text-white text-center mb-6">⚙️ Configurações do Agendador</h1>
 
