@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Console\Application;
 
 class ServiceLoader extends ServiceProvider
 {
@@ -100,6 +101,58 @@ class ServiceLoader extends ServiceProvider
             }
         }
     }
+
+    public static function loadServiceCommands()
+    {
+        $servicePath = base_path('services');
+        $directories = File::directories($servicePath);
+
+        foreach ($directories as $dir) {
+            $serviceName = basename($dir);
+            $commandPath = "{$dir}/Console/Commands";
+
+            if (File::exists($commandPath) && is_dir($commandPath)) {
+                foreach (File::files($commandPath) as $commandFile) {
+                    $commandClass = "Services\\{$serviceName}\\Console\\Commands\\" . pathinfo($commandFile, PATHINFO_FILENAME);
+
+                    if (class_exists($commandClass)) {
+                        Application::starting(function ($artisan) use ($commandClass) {
+                            $artisan->resolveCommands($commandClass);
+                        });
+
+
+                        Log::info("Comando Artisan registrado: {$commandClass}");
+                    }
+                }
+            }
+        }
+    }
+    public static function loadServiceJobs()
+    {
+        $servicePath = base_path('services');
+        $directories = File::directories($servicePath);
+
+        foreach ($directories as $dir) {
+            $serviceName = basename($dir);
+            $jobPath = "{$dir}/Jobs";
+
+            if (File::exists($jobPath) && is_dir($jobPath)) {
+                foreach (File::files($jobPath) as $jobFile) {
+                    $jobClass = "Services\\{$serviceName}\\Jobs\\" . pathinfo($jobFile, PATHINFO_FILENAME);
+
+                    if (class_exists($jobClass)) {
+                        app()->bind($jobClass, function ($app) use ($jobClass) {
+                            return new $jobClass();
+                        });
+
+                        Log::info("Job registrado: {$jobClass}");
+                    }
+                }
+            }
+        }
+    }
+
+
 
 
 

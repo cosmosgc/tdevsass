@@ -36,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
         ServiceLoader::registerServiceProviders();
         ServiceLoader::loadServiceRoutes();
         ServiceLoader::loadServiceViews();
-    }
 
+        ServiceLoader::loadServiceCommands(); // Não consegui fazer funciona
+        ServiceLoader::loadServiceJobs();
+    }
 }

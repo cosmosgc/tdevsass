@@ -78,13 +78,13 @@ class SocialSchedulerController extends Controller
     }
     public function postToWordPress(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string',
-            'content' => 'required|string',
-            'featured_media' => 'nullable|integer',
-            'categories' => 'nullable|array',
-            'post_date' => 'nullable|date',
-        ]);
+        // $request->validate([
+        //     'title' => 'required|string',
+        //     'content' => 'required|string',
+        //     'featured_media' => 'nullable|integer',
+        //     'categories' => 'nullable|array',
+        //     'post_date' => 'nullable|date',
+        // ]);
 
         $user = Auth::user();
         $settings = SchedulerSetting::where('user_id', $user->id)->first();
