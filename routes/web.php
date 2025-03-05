@@ -40,6 +40,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/subscribe/{service}', [SubscriptionController::class, 'checkout'])->name('subscription.checkout');
     Route::get('/subscribe/success', [SubscriptionController::class, 'success'])->name('subscription.success');
     Route::get('/subscribe/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    Route::post('/subscribe/{service}/{user}', [SubscriptionController::class, 'subscribeUser'])
+        ->name('subscription.subscribeUser');
 });
 
 use App\Http\Controllers\StripeWebhookController;

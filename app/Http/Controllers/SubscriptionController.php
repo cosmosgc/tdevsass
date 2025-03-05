@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Service;
 use App\Models\Subscription;
+use App\Models\User;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use Stripe\Subscription as StripeSubscription;
@@ -79,4 +80,29 @@ class SubscriptionController extends Controller
     {
         return redirect()->route('services.index')->with('error', 'Subscription canceled.');
     }
+
+    public function subscribeUser(Request $request, Service $service, User $user)
+    {
+        // Verifica se o usuário já tem uma assinatura ativa para este serviço
+        $existingSubscription = Subscription::where('user_id', $user->id)
+            ->where('service_id', $service->id)
+            ->where('stripe_status', 'active')
+            ->first();
+
+        if ($existingSubscription) {
+            return response()->json(['message' => 'User already subscribed to this service'], 400);
+        }
+
+        // Cria uma nova assinatura diretamente no banco de dados
+        $subscription = Subscription::create([
+            'user_id' => $user->id,
+            'service_id' => $service->id,
+            'stripe_subscription_id' => 'manual-' . uniqid(), // Identificação manual
+            'stripe_status' => 'active',
+            'expires_at' => now()->addMonth(), // Assinatura válida por um mês
+        ]);
+
+        return response()->json(['message' => 'User subscribed successfully', 'subscription' => $subscription], 201);
+    }
+
 }
