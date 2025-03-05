@@ -7,6 +7,7 @@ use App\Models\Service;
 use App\Models\Subscription;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use Stripe\Subscription as StripeSubscription;
 use Illuminate\Support\Facades\Auth;
 
 class SubscriptionController extends Controller
@@ -41,11 +42,41 @@ class SubscriptionController extends Controller
 
     public function success(Request $request)
     {
-        return view('subscriptions.success');
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        $session_id = $request->query('session_id');
+
+        if (!$session_id) {
+            return redirect()->route('services.index')->with('error', 'Invalid session ID');
+        }
+
+        // Recupera detalhes da sessão de checkout
+        $session = Session::retrieve($session_id);
+
+        // Recupera detalhes da assinatura do Stripe
+        $stripeSubscription = StripeSubscription::retrieve($session->subscription);
+
+        $user = Auth::user();
+        $service = Service::where('name', $session->line_items->data[0]->description)->first();
+
+        if (!$service) {
+            return redirect()->route('services.index')->with('error', 'Service not found.');
+        }
+
+        // Salva a assinatura no banco de dados
+        Subscription::create([
+            'user_id' => $user->id,
+            'service_id' => $service->id,
+            'stripe_subscription_id' => $stripeSubscription->id,
+            'stripe_status' => $stripeSubscription->status,
+            'expires_at' => now()->addMonth(), // Assumindo que seja mensal
+        ]);
+
+        return redirect()->route('services.index')->with('success', 'Subscription successful!');
     }
 
     public function cancel()
     {
-        return view('subscriptions.cancel');
+        return redirect()->route('services.index')->with('error', 'Subscription canceled.');
     }
 }

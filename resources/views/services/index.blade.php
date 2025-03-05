@@ -8,10 +8,19 @@
                     <p class="text-gray-300 mb-4">{{ $service->description }}</p>
                     <p class="text-lg font-bold text-green-400">Price: ${{ number_format($service->price, 2) }}</p>
 
-                    <a href="{{ url( $service->slug) }}"
-                       class="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200">
-                        Open Service
-                    </a>
+                    @if (auth()->user() && auth()->user()->isSubscribedTo($service))
+                        <a href="{{ url($service->slug) }}" class="mt-4 inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-200">
+                            Open Service
+                        </a>
+                    @else
+                        <form method="POST" action="{{ route('subscription.checkout', $service->id) }}">
+                            @csrf
+                            <button type="submit" class="mt-4 inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-200">
+                                Subscribe
+                            </button>
+                        </form>
+                    @endif
+
                 </div>
             @endforeach
         </div>

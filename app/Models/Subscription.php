@@ -18,16 +18,25 @@ class Subscription extends Model
         'expires_at',
     ];
 
+    /**
+     * Get the user who owns this subscription.
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Get the service this subscription belongs to.
+     */
     public function service()
     {
         return $this->belongsTo(Service::class);
     }
 
+    /**
+     * Check if the subscription is active.
+     */
     public function isActive()
     {
         return $this->stripe_status === 'active' && $this->expires_at > Carbon::now();
