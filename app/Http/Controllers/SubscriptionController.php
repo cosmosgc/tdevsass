@@ -58,7 +58,16 @@ class SubscriptionController extends Controller
         $stripeSubscription = StripeSubscription::retrieve($session->subscription);
 
         $user = Auth::user();
-        $service = Service::where('name', $session->line_items->data[0]->description)->first();
+        // dd($session);
+        // $lineItems = Session::retrieve($session_id, ['expand' => ['line_items']]);
+        $lineItems = Session::allLineItems($session_id);
+        // dd($lineItems);
+
+        if (!isset($lineItems)) {
+            return redirect()->route('services.index')->with('error', 'No line items found.');
+        }
+        //dd($lineItems->data);
+        $service = Service::where('name', $lineItems->data[0]->description)->first();
 
         if (!$service) {
             return redirect()->route('services.index')->with('error', 'Service not found.');
