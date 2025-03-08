@@ -13,14 +13,37 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <style>
+            body {
+                background-color: #121212; /* Preto profundo */
+                color: #f5f5f5; /* Branco suave */
+            }
+            header {
+                background-color: #1e1e1e; /* Cinza escuro */
+                border-bottom: 2px solid #ff6600; /* Laranja vibrante */
+            }
+            .min-h-screen {
+                background-color: #181818; /* Fundo dark */
+            }
+            .shadow {
+                box-shadow: 0 4px 6px rgba(255, 102, 0, 0.4); /* Sombra laranja */
+            }
+            a {
+                color: #ff6600;
+            }
+            a:hover {
+                color: #ffa64d;
+            }
+        </style>
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div class="min-h-screen">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white dark:bg-gray-800 shadow">
+                <header class="shadow">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
